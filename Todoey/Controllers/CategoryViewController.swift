@@ -33,14 +33,15 @@ class CategoryViewController: SwipeTableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
 
-        cell.textLabel?.text = categories?[indexPath.row].name ?? "No Categories added yet"
         cell.backgroundColor = UIColor(hexString: categories?[indexPath.row].colour ?? "1D9BF6")
-        
+        cell.textLabel?.textColor = ContrastColorOf(cell.backgroundColor!, returnFlat: true)
+        cell.textLabel?.text = categories?[indexPath.row].name ?? "No Categories added yet"
+
         return cell
     }
 
 
-    //MARK - TableView Delegate Methods
+    //MARK: - TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         performSegue(withIdentifier: "goToItems", sender: self)
@@ -78,7 +79,7 @@ class CategoryViewController: SwipeTableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    //MARK - Model Manupulation Methods
+    //MARK: - Model Manupulation Methods
     func save(category: Category) {
         
         do {

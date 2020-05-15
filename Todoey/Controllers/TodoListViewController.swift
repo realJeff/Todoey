@@ -15,6 +15,8 @@ class TodoListViewController: SwipeTableViewController {
     
     var todoItems: Results<Item>?
     
+    @IBOutlet weak var searchBar: UISearchBar!
+    
     var selectedCategory : Category? {
         didSet {
             loadItems()
@@ -23,11 +25,41 @@ class TodoListViewController: SwipeTableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))        
     }
     
-    //MARK - TableView Datasource Methods
+    override func viewWillAppear(_ animated: Bool) {
+        
+        guard let colourHex = selectedCategory?.colour else {
+            fatalError("Selected category is not defined")
+        }
+        
+        updateNavBar(withHexCode: colourHex)
+
+        title = selectedCategory?.name
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        updateNavBar(withHexCode: "1D9BF6")
+    }
+    
+    //MARK: -  Nav Bar Setup Methods
+    func updateNavBar(withHexCode colourHexCode: String) {
+        guard let navBar = navigationController?.navigationBar else {
+            fatalError("Navigation Controller does not exist")
+        }
+
+        guard let navBarColour = UIColor(hexString: colourHexCode) else {
+            fatalError("Navigation bar colour is not defined")
+        }
+
+        navBar.barTintColor = navBarColour
+        navBar.tintColor = ContrastColorOf(navBarColour, returnFlat: true)
+        navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(navBarColour, returnFlat: true)]
+        
+        searchBar.barTintColor = navBarColour
+    }
+    
+    //MARK: - TableView Datasource Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return todoItems?.count ?? 1
     }
@@ -51,7 +83,7 @@ class TodoListViewController: SwipeTableViewController {
         return cell
     }
     
-    //MARK - TableView Delegate Methods
+    //MARK: - TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
         if let item = todoItems?[indexPath.row] {
@@ -69,7 +101,7 @@ class TodoListViewController: SwipeTableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
-    //MARK - Add New Items
+    //MARK: - Add New Items
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
         var textField = UITextField()
@@ -104,7 +136,7 @@ class TodoListViewController: SwipeTableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    //MARK - Model Manupulation Methods
+    //MARK: - Model Manupulation Methods
     func save(item: Item) {
         
         do {
@@ -140,7 +172,7 @@ class TodoListViewController: SwipeTableViewController {
     }
 }
 
-// MARK - Search bar methods
+// MARK: - Search bar methods
 extension TodoListViewController: UISearchBarDelegate {
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
